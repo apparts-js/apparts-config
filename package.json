@@ -1,0 +1,12 @@
+{
+  "name": "apparts-config",
+  "version": "1.0.0",
+  "description": "A config-loading framework",
+  "main": "index.js",
+  "git": "git@ph-uhl.com:Apparts/apparts-config.git"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Philipp Uhl",
+  "license": "UNLICENSED"
+}
