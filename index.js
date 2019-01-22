@@ -1,5 +1,7 @@
 "use strict";
 
+const fs = require('fs');
+
 module.exports.configs = {};
 
 /**
@@ -36,7 +38,18 @@ module.exports.load = (config) => {
       }
     }
   } else {
-    module.exports.configs[config] = require('../config/' + config + '.json');
+    const directory = `${process.cwd()}/config/${config}.json`;
+    try {
+      module.exports.configs[config] = JSON.parse(fs.readFileSync(directory));
+    } catch(e){
+      if (e.code === 'ENOENT') {
+        throw (`Config in directory ${directory} not found`);
+      } else if(e instanceof SyntaxError) {
+        throw (`Parsing of Config in directory ${directory} failed`);
+      } else {
+        throw (`Unknown error while trying to read and parse ${directory}: ${e}`);
+      }
+    }
   }
 };
 
