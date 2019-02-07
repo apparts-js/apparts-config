@@ -1,0 +1,31 @@
+#+TITLE: Config
+#+DATE: [2019-02-07 Thu]
+#+AUTHOR: Philipp Uhl
+
+* Usage
+
+Storage in an environment variable can be done in two ways:
+1. as a string that is parsable by ~JSON.parse~
+2. as a Base-64 encoded string that decodes to a ~JSON.parse~-parsable
+   string
+
+** Node environment
+
+To require a configuration that is stored in one of the files
+- =config/my-color.json=
+- =config/my-color.js=
+or the environment variable =MY_COLOR= (note, a dash becomes an
+underscore and everything is in uppercase):
+#+BEGIN_SRC sh
+const Colors = require('apparts-config').get('my-color');
+#+END_SRC
+
+
+** Webpack for web environment
+
+To require a configuration that is stored in the environment variable
+=MY_COLOR= (note, a dash becomes an underscore and everything is in
+uppercase):
+#+BEGIN_SRC sh
+const Colors = require('apparts-config').get('my-color');
+#+END_SRC
