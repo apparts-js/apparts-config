@@ -46,15 +46,16 @@ module.exports.load = (config) => {
       module.exports.configs[config] = require(directoryJS);
       return;
     } catch(e){
-      throw (`Config not found in file ${directoryJS}`
-             + ` or ${directoryJS} contains errors: ${e}`);
+      if(e.code !== 'MODULE_NOT_FOUND'){
+        throw (`Unexpected error with ${directoryJS}: ${e}`);
+      }
     }
 
     try {
       module.exports.configs[config] = JSON.parse(fs.readFileSync(directoryJSON));
     } catch (e) {
-      if (e.code !== 'ENOENT') {
-        throw (`Unknown error while trying to read ${directoryJSON}: ${e}`);
+      if (e.code === 'ENOENT') {
+        throw (`Neither ${directoryJSON} nor ${directoryJS} found: ${e}`);
       } else if(e instanceof SyntaxError) {
         throw (`Parsing of Config in directory ${directoryJSON} failed`);
       } else {
