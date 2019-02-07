@@ -19,7 +19,7 @@ module.exports.configs = {};
 module.exports.load = (config) => {
   let env_name = config.toUpperCase().replace('-', '_');
   if(process.env[env_name]){
-    if(/["{\[]$/.test(process.env[env_name])){
+    if(/["{\[]/.test(process.env[env_name])){
       try {
         module.exports.configs[config] =
           JSON.parse(process.env[env_name]);
@@ -41,31 +41,24 @@ module.exports.load = (config) => {
   } else {
     const directoryJSON = `${process.cwd()}/config/${config}.json`;
     const directoryJS = `${process.cwd()}/config/${config}.js`;
-    let contentJSON = undefined;
+
     try {
-      contentJSON = fs.readFileSync(directoryJSON);
+      module.exports.configs[config] = require(directoryJS);
+      return;
+    } catch(e){
+      throw (`Config not found in file ${directoryJS}`
+             + ` or ${directoryJS} contains errors: ${e}`);
+    }
+
+    try {
+      module.exports.configs[config] = JSON.parse(fs.readFileSync(directoryJSON));
     } catch (e) {
       if (e.code !== 'ENOENT') {
         throw (`Unknown error while trying to read ${directoryJSON}: ${e}`);
-      }
-      try {
-        module.exports.configs[config] = require(directoryJS);
-        return;
-      } catch(e){
-        throw (`Config neither in file ${directoryJSON} nor in file`
-               + ` ${directoryJS} found or ${directoryJS} contains errors: ${e}`);
-      }
-    }
-
-    if(contentJSON){
-      try {
-        module.exports.configs[config] = JSON.parse(contentJSON);
-      } catch(e){
-        if(e instanceof SyntaxError) {
-          throw (`Parsing of Config in directory ${directoryJSON} failed`);
-        } else {
-          throw (`Unknown error while trying to parse ${directoryJSON}: ${e}`);
-        }
+      } else if(e instanceof SyntaxError) {
+        throw (`Parsing of Config in directory ${directoryJSON} failed`);
+      } else {
+        throw (`Unknown error while trying to parse ${directoryJSON}: ${e}`);
       }
     }
   }
