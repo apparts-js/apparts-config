@@ -11,8 +11,9 @@ module.exports.configs = {};
  * is found, it is tried to read it as JSON, if not possible it will
  * be decoded from base64 and and then read as JSON.  If no such
  * variale is found, a file with the config-name and the
- * json-file-ending will be required from a config-folder that lies in
- * the directory in which node has been executed.
+ * json-file-ending or the js-file-ending will be required from a
+ * config-folder that lies in the directory in which node has been
+ * executed.
  * @param config String that contains config-name
  */
 module.exports.load = (config) => {
@@ -38,16 +39,33 @@ module.exports.load = (config) => {
       }
     }
   } else {
-    const directory = `${process.cwd()}/config/${config}.json`;
+    const directoryJSON = `${process.cwd()}/config/${config}.json`;
+    const directoryJS = `${process.cwd()}/config/${config}.js`;
+    let contentJSON = undefined;
     try {
-      module.exports.configs[config] = JSON.parse(fs.readFileSync(directory));
-    } catch(e){
-      if (e.code === 'ENOENT') {
-        throw (`Config in directory ${directory} not found`);
-      } else if(e instanceof SyntaxError) {
-        throw (`Parsing of Config in directory ${directory} failed`);
-      } else {
-        throw (`Unknown error while trying to read and parse ${directory}: ${e}`);
+      contentJSON = fs.readFileSync(directoryJSON);
+    } catch (e) {
+      if (e.code !== 'ENOENT') {
+        throw (`Unknown error while trying to read ${directoryJSON}: ${e}`);
+      }
+      try {
+        module.exports.configs[config] = require(directoryJS);
+        return;
+      } catch(e){
+        throw (`Config neither in file ${directoryJSON} nor in file`
+               + ` ${directoryJS} found or ${directoryJS} contains errors: ${e}`);
+      }
+    }
+
+    if(contentJSON){
+      try {
+        module.exports.configs[config] = JSON.parse(contentJSON);
+      } catch(e){
+        if(e instanceof SyntaxError) {
+          throw (`Parsing of Config in directory ${directoryJSON} failed`);
+        } else {
+          throw (`Unknown error while trying to parse ${directoryJSON}: ${e}`);
+        }
       }
     }
   }
