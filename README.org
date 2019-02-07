@@ -29,3 +29,20 @@ uppercase):
 #+BEGIN_SRC sh
 const Colors = require('apparts-config').get('my-color');
 #+END_SRC
+
+In order to create environment variables use the following webpack (v
+> 2.0) configuration options:
+
+#+BEGIN_SRC js
+module.exports = env => {
+  return {
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env': {
+          'MY_COLOR': JSON.stringify(JSON.stringify(require('./src/utils/colors.js')))
+        }
+      }),
+    ]
+  }
+};
+#+END_SRC
