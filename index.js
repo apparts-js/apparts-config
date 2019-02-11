@@ -1,7 +1,5 @@
 "use strict";
 
-const fs = require('fs');
-
 module.exports.configs = {};
 
 /**
@@ -52,6 +50,7 @@ module.exports.load = (config) => {
     }
 
     try {
+      const fs = require('fs');
       module.exports.configs[config] = JSON.parse(fs.readFileSync(directoryJSON));
     } catch (e) {
       if (e.code === 'ENOENT') {
