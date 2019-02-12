@@ -38,6 +38,7 @@ module.exports.load = (config) => {
     }
   } else {
     const directoryJSON = `${process.cwd()}/config/${config}.json`;
+    const directoryJSONExample = `${process.cwd()}/config/${config}.example.json`;
     const directoryJS = `${process.cwd()}/config/${config}.js`;
 
     try {
@@ -50,12 +51,29 @@ module.exports.load = (config) => {
     }
 
     try {
-      const fs = require('fs');
-      module.exports.configs[config] = JSON.parse(fs.readFileSync(directoryJSON));
+      try {
+        const fs = require('fs');
+        module.exports.configs[config] = JSON.parse(fs.readFileSync(directoryJSON));
+      } catch (e) {
+        if (e.code === 'ENOENT') {
+          try {
+            const fs = require('fs');
+            module.exports.configs[config] = JSON.parse(
+              fs.readFileSync(directoryJSONExample));
+          } catch(e) {
+            if (e.code === 'ENOENT') {
+              throw (`Neither ${directoryJSON} nor ${directoryJSONExample}`
+                     + ` nor ${directoryJS} found: ${e}`);
+            } else {
+              throw e;
+            }
+          }
+        } else {
+          throw e;
+        }
+      }
     } catch (e) {
-      if (e.code === 'ENOENT') {
-        throw (`Neither ${directoryJSON} nor ${directoryJS} found: ${e}`);
-      } else if(e instanceof SyntaxError) {
+      if(e instanceof SyntaxError) {
         throw (`Parsing of Config in directory ${directoryJSON} failed`);
       } else {
         throw (`Unknown error while trying to parse ${directoryJSON}: ${e}`);

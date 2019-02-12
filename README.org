@@ -46,3 +46,42 @@ module.exports = env => {
   }
 };
 #+END_SRC
+
+** React-Nativ environment
+
+This package is not supported for that kind of environment. In order
+to use packages that require this package anyways the following
+configuration is necessary:
+
+It is necessary to create an alias for the module. This requires the
+module =babel-plugin-module-resolver= to be installed and the
+following to be present in the file =babel.config.js=:
+
+#+BEGIN_SRC js
+module.exports = {
+  // ...
+  "plugins": [
+    ["module-resolver", {
+      "alias": {
+        "apparts-config": "./src/config.js"
+      }
+    }]
+  ]
+};
+#+END_SRC
+
+
+The file =./src/config.js= must be like the following and containing
+all the configuration:
+
+#+BEGIN_SRC js
+module.exports.get = (config) => {
+  return {
+    // my configs here
+    configName: {
+      // all my configuration for configName
+    }
+    // ...
+  }[config];
+};
+#+END_SRC
