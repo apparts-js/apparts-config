@@ -1,15 +1,21 @@
-#+TITLE: Config
+#+TITLE: @apparts/config
 #+DATE: [2019-02-07 Thu]
 #+AUTHOR: Philipp Uhl
 
 * Usage
+
+This package can read configuration from environment variables, or, 
+if not found in, from the folder =config= in the root-directory of the
+project.
+
+** As environment variable
 
 Storage in an environment variable can be done in two ways:
 1. as a string that is parsable by ~JSON.parse~
 2. as a Base-64 encoded string that decodes to a ~JSON.parse~-parsable
    string
 
-** Node environment
+** From a folder when running in a Node environment
 
 To require a configuration that is stored in one of the files
 - =config/my-color.json=
