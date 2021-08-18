@@ -15,25 +15,30 @@ module.exports.configs = {};
  * @param config String that contains config-name
  */
 module.exports.load = (config) => {
-  let env_name = config.toUpperCase().replace('-', '_');
-  if(process.env[env_name]){
-    if(/["{\[]/.test(process.env[env_name])){
+  let env_name = config.toUpperCase().replace(/-/g, "_");
+  if (process.env[env_name]) {
+    if (/["{\[]/.test(process.env[env_name])) {
       try {
-        module.exports.configs[config] =
-          JSON.parse(process.env[env_name]);
-      } catch(e) {
-        throw (`Parsing of Env-Config failed: "${env_name}" with`
-                     + ` value "${process.env[env_name]}"`);
+        module.exports.configs[config] = JSON.parse(process.env[env_name]);
+      } catch (e) {
+        throw (
+          `Parsing of Env-Config failed: "${env_name}" with` +
+          ` value "${process.env[env_name]}"`
+        );
       }
     } else {
       try {
-        module.exports.configs[config] =
-          JSON.parse(Buffer.from(process.env[env_name], 'base64')
-                     .toString('ascii'));
-      } catch(e){
-        throw (`Parsing of Env-B64-Config failed: "${env_name}" with`
-                     + ` value "${process.env[env_name]}"`);
-        throw (`Ascii: "${Buffer.from(process.env[env_name], 'base64').toString('ascii')}"`);
+        module.exports.configs[config] = JSON.parse(
+          Buffer.from(process.env[env_name], "base64").toString("ascii")
+        );
+      } catch (e) {
+        throw (
+          `Parsing of Env-B64-Config failed: "${env_name}" with` +
+          ` value "${process.env[env_name]}"`
+        );
+        throw `Ascii: "${Buffer.from(process.env[env_name], "base64").toString(
+          "ascii"
+        )}"`;
       }
     }
   } else {
@@ -44,26 +49,31 @@ module.exports.load = (config) => {
     try {
       module.exports.configs[config] = require(directoryJS);
       return;
-    } catch(e){
-      if(e.code !== 'MODULE_NOT_FOUND'){
-        throw (`Unexpected error with ${directoryJS}: ${e}`);
+    } catch (e) {
+      if (e.code !== "MODULE_NOT_FOUND") {
+        throw `Unexpected error with ${directoryJS}: ${e}`;
       }
     }
 
     try {
       try {
-        const fs = require('fs');
-        module.exports.configs[config] = JSON.parse(fs.readFileSync(directoryJSON));
+        const fs = require("fs");
+        module.exports.configs[config] = JSON.parse(
+          fs.readFileSync(directoryJSON)
+        );
       } catch (e) {
-        if (e.code === 'ENOENT') {
+        if (e.code === "ENOENT") {
           try {
-            const fs = require('fs');
+            const fs = require("fs");
             module.exports.configs[config] = JSON.parse(
-              fs.readFileSync(directoryJSONExample));
-          } catch(e) {
-            if (e.code === 'ENOENT') {
-              throw (`Neither ${directoryJSON} nor ${directoryJSONExample}`
-                     + ` nor ${directoryJS} found: ${e}`);
+              fs.readFileSync(directoryJSONExample)
+            );
+          } catch (e) {
+            if (e.code === "ENOENT") {
+              throw (
+                `Neither ${directoryJSON} nor ${directoryJSONExample}` +
+                ` nor ${directoryJS} found: ${e}`
+              );
             } else {
               throw e;
             }
@@ -73,10 +83,10 @@ module.exports.load = (config) => {
         }
       }
     } catch (e) {
-      if(e instanceof SyntaxError) {
-        throw (`Parsing of Config in directory ${directoryJSON} failed`);
+      if (e instanceof SyntaxError) {
+        throw `Parsing of Config in directory ${directoryJSON} failed`;
       } else {
-        throw (`Unknown error while trying to parse ${directoryJSON}: ${e}`);
+        throw `Unknown error while trying to parse ${directoryJSON}: ${e}`;
       }
     }
   }
@@ -89,7 +99,7 @@ module.exports.load = (config) => {
  * @returns {} Configuration-object
  */
 module.exports.get = (config) => {
-  if(!module.exports.configs[config]){
+  if (!module.exports.configs[config]) {
     module.exports.load(config);
   }
   return module.exports.configs[config];
