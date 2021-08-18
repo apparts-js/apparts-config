@@ -1,6 +1,6 @@
 {
   "name": "@apparts/config",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A config-loading framework",
   "main": "index.js",
   "git": "git@github.com:phuhl/apparts-config.git",
