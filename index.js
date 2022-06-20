@@ -1,6 +1,19 @@
-"use strict";
-
 module.exports.configs = {};
+
+let ENV;
+module.exports.setEnv = (env) => {
+  ENV = env;
+};
+
+const parseB64 = (str) => {
+  if (atob) {
+    return atob(str);
+  } else {
+    return Buffer.from(str, "base64").toString("ascii");
+  }
+};
+
+const makeEnvName = (name) => name.toUpperCase().replace(/-/g, "_");
 
 /**
  * Loads a config. Tries to load from an environment variable with the
@@ -15,80 +28,98 @@ module.exports.configs = {};
  * @param config String that contains config-name
  */
 module.exports.load = (config) => {
-  let env_name = config.toUpperCase().replace(/-/g, "_");
-  if (process.env[env_name]) {
-    if (/["{\[]/.test(process.env[env_name])) {
-      try {
-        module.exports.configs[config] = JSON.parse(process.env[env_name]);
-      } catch (e) {
-        throw (
-          `Parsing of Env-Config failed: "${env_name}" with` +
-          ` value "${process.env[env_name]}"`
-        );
-      }
-    } else {
-      try {
-        module.exports.configs[config] = JSON.parse(
-          Buffer.from(process.env[env_name], "base64").toString("ascii")
-        );
-      } catch (e) {
-        throw (
-          `Parsing of Env-B64-Config failed: "${env_name}" with` +
-          ` value "${process.env[env_name]}"`
-        );
-        throw `Ascii: "${Buffer.from(process.env[env_name], "base64").toString(
-          "ascii"
-        )}"`;
-      }
-    }
-  } else {
-    const directoryJSON = `${process.cwd()}/config/${config}.json`;
-    const directoryJSONExample = `${process.cwd()}/config/${config}.example.json`;
-    const directoryJS = `${process.cwd()}/config/${config}.js`;
-
-    try {
-      module.exports.configs[config] = require(directoryJS);
-      return;
-    } catch (e) {
-      if (e.code !== "MODULE_NOT_FOUND") {
-        throw `Unexpected error with ${directoryJS}: ${e}`;
-      }
-    }
-
-    try {
-      try {
-        const fs = require("fs");
-        module.exports.configs[config] = JSON.parse(
-          fs.readFileSync(directoryJSON)
-        );
-      } catch (e) {
-        if (e.code === "ENOENT") {
-          try {
-            const fs = require("fs");
-            module.exports.configs[config] = JSON.parse(
-              fs.readFileSync(directoryJSONExample)
-            );
-          } catch (e) {
-            if (e.code === "ENOENT") {
-              throw (
-                `Neither ${directoryJSON} nor ${directoryJSONExample}` +
-                ` nor ${directoryJS} found: ${e}`
-              );
-            } else {
-              throw e;
-            }
-          }
-        } else {
-          throw e;
+  let env_name = makeEnvName(config);
+  try {
+    const env = ENV || process.env;
+    if (env[env_name] || env["REACT_APP_" + env_name]) {
+      const val = env[env_name] || env["REACT_APP_" + env_name];
+      if (/["{\[]/.test(val)) {
+        try {
+          module.exports.configs[config] = JSON.parse(val);
+        } catch (e) {
+          throw (
+            `Parsing of Env-Config failed: "${env_name}" with` +
+            ` value "${val}"`
+          );
+        }
+      } else {
+        try {
+          module.exports.configs[config] = JSON.parse(parseB64(val));
+        } catch (e) {
+          throw (
+            `Parsing of Env-B64-Config failed: "${env_name}" with` +
+            ` value "${val}"`
+          );
+          throw `Ascii: "${Buffer.from(val, "base64").toString("ascii")}"`;
         }
       }
-    } catch (e) {
-      if (e instanceof SyntaxError) {
-        throw `Parsing of Config in directory ${directoryJSON} failed`;
-      } else {
-        throw `Unknown error while trying to parse ${directoryJSON}: ${e}`;
+    } else {
+      const directoryJSON = `${process.cwd()}/config/${config}.json`;
+      const directoryJSONExample = `${process.cwd()}/config/${config}.example.json`;
+      const directoryJS = `${process.cwd()}/config/${config}.js`;
+
+      try {
+        module.exports.configs[config] = require(directoryJS);
+        return;
+      } catch (e) {
+        if (e.code !== "MODULE_NOT_FOUND") {
+          throw `Unexpected error with ${directoryJS}: ${e}`;
+        }
+      }
+
+      try {
+        try {
+          const fs = require("fs");
+          module.exports.configs[config] = JSON.parse(
+            fs.readFileSync(directoryJSON)
+          );
+        } catch (e) {
+          if (e.code === "ENOENT") {
+            try {
+              const fs = require("fs");
+              module.exports.configs[config] = JSON.parse(
+                fs.readFileSync(directoryJSONExample)
+              );
+            } catch (e) {
+              if (e.code === "ENOENT") {
+                throw (
+                  `Neither ${directoryJSON} nor ${directoryJSONExample}` +
+                  ` nor ${directoryJS} found: ${e}`
+                );
+              } else {
+                throw e;
+              }
+            }
+          } else {
+            throw e;
+          }
+        }
+      } catch (e) {
+        if (e instanceof SyntaxError) {
+          throw `Parsing of Config in directory ${directoryJSON} failed`;
+        } else {
+          throw `Unknown error while trying to parse ${directoryJSON}: ${e}`;
+        }
       }
     }
+  } catch (e) {
+    console.log(e);
+    throw `Could not find config ${config}. Please make sure, you set up the config correctly:
+
+On node systems, the config is stored in one of these locations:
+- in a config folder as ${config}.json or ${config}.js or ${config}.example.json
+- as a environment variable ${makeEnvName(
+      config
+    )}, either as raw text or as base 64 encoded text.
+
+With create-react-app:
+- Make sure you called
+  > import { setEnv } from "@apparts/config"; setEnv(process.env);
+  at the beginning of your app.
+- Config is in the .env file with the variable name REACT_APP_${makeEnvName(
+      config
+    )} either as raw text or base 64 encoded.
+    `;
   }
 };
 
