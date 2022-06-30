@@ -59,7 +59,10 @@ module.exports.load = (config) => {
       const directoryJS = `${process.cwd()}/config/${config}.js`;
 
       try {
-        module.exports.configs[config] = require(directoryJS);
+        // eval helps to get's rid of warnings in react env.
+        module.exports.configs[config] = eval(
+          `require(${JSON.stringify(directoryJS)})`
+        );
         return;
       } catch (e) {
         if (e.code !== "MODULE_NOT_FOUND") {
@@ -69,14 +72,16 @@ module.exports.load = (config) => {
 
       try {
         try {
-          const fs = require("fs");
+          // eval helps to get's rid of warnings in react env.
+          const fs = eval('require("fs")');
           module.exports.configs[config] = JSON.parse(
             fs.readFileSync(directoryJSON)
           );
         } catch (e) {
           if (e.code === "ENOENT") {
             try {
-              const fs = require("fs");
+              // eval helps to get's rid of warnings in react env.
+              const fs = eval('require("fs")');
               module.exports.configs[config] = JSON.parse(
                 fs.readFileSync(directoryJSONExample)
               );
