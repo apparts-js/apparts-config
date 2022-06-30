@@ -6,10 +6,14 @@ module.exports.setEnv = (env) => {
 };
 
 const parseB64 = (str) => {
-  if (atob) {
-    return atob(str);
-  } else {
-    return Buffer.from(str, "base64").toString("ascii");
+  try {
+    if (atob) {
+      return atob(str);
+    }
+  } catch (e) {
+    if (e instanceof ReferenceError) {
+      return Buffer.from(str, "base64").toString("ascii");
+    }
   }
 };
 

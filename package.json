@@ -16,5 +16,9 @@
   "license": "MIT",
   "devDependencies": {
     "jest": "^28.1.2"
+  },
+  "volta": {
+    "node": "14.18.2",
+    "npm": "7.18.1"
   }
 }
