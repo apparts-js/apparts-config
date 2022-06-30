@@ -135,3 +135,10 @@ module.exports.get = (config) => {
   }
   return module.exports.configs[config];
 };
+
+module.exports.getConfig = (config) => {
+  if (!module.exports.configs[config]) {
+    module.exports.load(config);
+  }
+  return module.exports.configs[config];
+};
