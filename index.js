@@ -37,7 +37,7 @@ module.exports.load = (config) => {
     const env = ENV || process.env;
     if (env[env_name] || env["REACT_APP_" + env_name]) {
       const val = env[env_name] || env["REACT_APP_" + env_name];
-      if (/["{\[]/.test(val)) {
+      if (/["{\[]|true|false|null/.test(val)) {
         try {
           module.exports.configs[config] = JSON.parse(val);
         } catch (e) {

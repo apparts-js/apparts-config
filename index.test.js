@@ -12,6 +12,7 @@ describe("getConfig", () => {
   });
   it("should get config from env", async () => {
     expect(getConfig("test3")).toBe("envtest");
+    expect(getConfig("btest")).toBe(false);
   });
   it("should get config from base64 env", async () => {
     expect(getConfig("test4")).toBe("envtest2");

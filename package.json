@@ -5,8 +5,8 @@
   "main": "index.js",
   "git": "git@github.com:phuhl/apparts-config.git",
   "scripts": {
-    "test": "TEST3='\"envtest\"' TEST4=ImVudnRlc3QyIg== REACT_APP_TEST5='\"react\"' jest --watch  --clearMocks",
-    "test:one": "TEST3='\"envtest\"' TEST4=ImVudnRlc3QyIg== REACT_APP_TEST5='\"react\"' jest --clearMocks",
+    "test": "BTEST=false TEST3='\"envtest\"' TEST4=ImVudnRlc3QyIg== REACT_APP_TEST5='\"react\"' jest --watch  --clearMocks",
+    "test:one": "BTEST=false TEST3='\"envtest\"' TEST4=ImVudnRlc3QyIg== REACT_APP_TEST5='\"react\"' jest --clearMocks",
     "test:envVars": ""
   },
   "files": [
