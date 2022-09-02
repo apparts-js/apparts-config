@@ -37,24 +37,16 @@ module.exports.load = (config) => {
     const env = ENV || process.env;
     if (env[env_name] || env["REACT_APP_" + env_name]) {
       const val = env[env_name] || env["REACT_APP_" + env_name];
-      if (/["{\[]|true|false|null/.test(val)) {
-        try {
-          module.exports.configs[config] = JSON.parse(val);
-        } catch (e) {
-          throw (
-            `Parsing of Env-Config failed: "${env_name}" with` +
-            ` value "${val}"`
-          );
-        }
-      } else {
+      try {
+        module.exports.configs[config] = JSON.parse(val);
+      } catch (e) {
         try {
           module.exports.configs[config] = JSON.parse(parseB64(val));
         } catch (e) {
           throw (
-            `Parsing of Env-B64-Config failed: "${env_name}" with` +
+            `Parsing as JSON or base64 failed: "${env_name}" with` +
             ` value "${val}"`
           );
-          throw `Ascii: "${Buffer.from(val, "base64").toString("ascii")}"`;
         }
       }
     } else {
