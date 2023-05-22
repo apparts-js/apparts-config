@@ -20,4 +20,7 @@ describe("getConfig", () => {
   it("should get config from react env", async () => {
     expect(getConfig("test5")).toBe("react");
   });
+  it("should get config from vite env", async () => {
+    expect(getConfig("test6")).toBe("vite");
+  });
 });

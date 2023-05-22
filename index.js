@@ -35,8 +35,15 @@ module.exports.load = (config) => {
   let env_name = makeEnvName(config);
   try {
     const env = ENV || process.env;
-    if (env[env_name] || env["REACT_APP_" + env_name]) {
-      const val = env[env_name] || env["REACT_APP_" + env_name];
+    if (
+      env[env_name] ||
+      env["REACT_APP_" + env_name] ||
+      env["VITE_" + env_name]
+    ) {
+      const val =
+        env[env_name] ||
+        env["REACT_APP_" + env_name] ||
+        env["VITE_" + env_name];
       try {
         module.exports.configs[config] = JSON.parse(val);
       } catch (e) {
@@ -119,7 +126,7 @@ With create-react-app:
   at the beginning of your app.
 - Config is in the .env file with the variable name REACT_APP_${makeEnvName(
       config
-    )} either as raw text or base 64 encoded.
+    )} or VITE_${makeEnvName(config)} either as raw text or base 64 encoded.
     `;
   }
 };
