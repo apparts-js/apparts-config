@@ -65,7 +65,7 @@ setEnv(process.env);
 #+END_SRC
 
 Your config variables need to be stored in the =.env= file, with all
-config names prefixed with =REACT_APP_=.
+config names prefixed with =REACT_APP_= or =VITE_=.
 
-To get the config =my-color= you must store =REACT_APP_MY_COLOR= in your
+E.g. to get the config =my-color= you must store =REACT_APP_MY_COLOR= in your
 =.env= file. You can store the values as raw string or base64 encoded.
