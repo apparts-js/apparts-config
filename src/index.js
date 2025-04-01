@@ -7,7 +7,9 @@ module.exports.setEnv = (env) => {
 
 const parseB64 = (str) => {
   try {
+    // eslint-disable-next-line no-undef
     if (atob) {
+      // eslint-disable-next-line no-undef
       return atob(str);
     }
   } catch (e) {
@@ -32,7 +34,7 @@ const makeEnvName = (name) => name.toUpperCase().replace(/-/g, "_");
  * @param config String that contains config-name
  */
 module.exports.load = (config) => {
-  let env_name = makeEnvName(config);
+  const env_name = makeEnvName(config);
   try {
     const env = ENV || process.env;
     if (
@@ -64,7 +66,7 @@ module.exports.load = (config) => {
       try {
         // eval helps to get's rid of warnings in react env.
         module.exports.configs[config] = eval(
-          `require(${JSON.stringify(directoryJS)})`
+          `require(${JSON.stringify(directoryJS)})`,
         );
         return;
       } catch (e) {
@@ -78,7 +80,7 @@ module.exports.load = (config) => {
           // eval helps to get's rid of warnings in react env.
           const fs = eval('require("fs")');
           module.exports.configs[config] = JSON.parse(
-            fs.readFileSync(directoryJSON)
+            fs.readFileSync(directoryJSON),
           );
         } catch (e) {
           if (e.code === "ENOENT") {
@@ -86,7 +88,7 @@ module.exports.load = (config) => {
               // eval helps to get's rid of warnings in react env.
               const fs = eval('require("fs")');
               module.exports.configs[config] = JSON.parse(
-                fs.readFileSync(directoryJSONExample)
+                fs.readFileSync(directoryJSONExample),
               );
             } catch (e) {
               if (e.code === "ENOENT") {
@@ -111,13 +113,14 @@ module.exports.load = (config) => {
       }
     }
   } catch (e) {
+    // eslint-disable-next-line no-restricted-globals
     console.log(e);
     throw `Could not find config ${config}. Please make sure, you set up the config correctly:
 
 On node systems, the config is stored in one of these locations:
 - in a config folder as ${config}.json or ${config}.js or ${config}.example.json
 - as a environment variable ${makeEnvName(
-      config
+      config,
     )}, either as raw text or as base 64 encoded text.
 
 With create-react-app:
@@ -125,7 +128,7 @@ With create-react-app:
   > import { setEnv } from "@apparts/config"; setEnv(process.env);
   at the beginning of your app.
 - Config is in the .env file with the variable name REACT_APP_${makeEnvName(
-      config
+      config,
     )} or VITE_${makeEnvName(config)} either as raw text or base 64 encoded.
     `;
   }
