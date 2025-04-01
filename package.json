@@ -19,7 +19,7 @@
     "ci:eslint": "eslint . -c eslint-ci.config.mjs"
   },
   "files": [
-    "src/**/*"
+    "build"
   ],
   "author": "Philipp Uhl",
   "license": "MIT",
