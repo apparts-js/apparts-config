@@ -36,8 +36,10 @@ export const get = <S extends types.Schema<any, any>>(
   return getConfig(config, schema);
 };
 
-let ENV: Record<string, string> = {};
-export const setEnv = (env: Record<string, string>) => {
+type Env = Record<string, string | boolean | number>;
+
+let ENV: Env = {};
+export const setEnv = (env: Env) => {
   ENV = env;
 };
 

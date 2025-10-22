@@ -53,4 +53,8 @@ describe("getConfig", () => {
       ),
     ).toMatchObject({ configVal: 9 });
   });
+  it("should allow primitiv value", () => {
+    setEnv({ DEV: true });
+    expect(getConfig("dev", types.boolean())).toBe(true);
+  });
 });
