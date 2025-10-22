@@ -13,7 +13,7 @@
     "clean": "rimraf coverage build tmp",
     "ci": "npm ci && npm run ci:prettier && npm run ci:eslint && npm run ci:test",
     "ci:prettier": "CI=true prettier --check .",
-    "ci:test": "CI=true npm run test:one",
+    "ci:test": "CI=true npm run test",
     "ci:eslint": "eslint . -c eslint-ci.config.mjs"
   },
   "files": [
