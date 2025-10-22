@@ -23,7 +23,9 @@ export const getConfig = <S extends types.Schema<any, any>>(
       schema,
     );
     if (invalid) {
-      throw new Error(`Config "${config}" is invalid:\n${invalid}`);
+      throw new Error(
+        `Config "${config}" with value "${configs[config]}" is invalid:\n${invalid}`,
+      );
     }
   }
   return configs[config];
