@@ -6,9 +6,7 @@
   "types": "build/index.d.ts",
   "git": "git@github.com:phuhl/apparts-config.git",
   "scripts": {
-    "test": "BTEST=false TEST3='\"envtest\"' TEST4=ImVudnRlc3QyIg== REACT_APP_TEST5='\"react\"' VITE_TEST6='\"vite\"' jest --watch  --clearMocks",
-    "test:one": "BTEST=false TEST3='\"envtest\"' TEST4=ImVudnRlc3QyIg== REACT_APP_TEST5='\"react\"' VITE_TEST6='\"vite\"' jest --clearMocks",
-    "test:envVars": "",
+    "test": "BTEST=false TEST3='\"envtest\"' TEST4=ImVudnRlc3QyIg== REACT_APP_TEST5='\"react\"' VITE_TEST6='\"vite\"' vitest",
     "prepublishOnly": "npm run ci && npm run clean && npm run build",
     "build": "tsc -p tsconfig.release.json",
     "build:watch": "tsc -w -p tsconfig.release.json",
@@ -24,23 +22,27 @@
   "author": "Philipp Uhl",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.38.0",
     "@tsconfig/node18": "^18.2.4",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.16",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",
-    "eslint": "^9.23.0",
-    "eslint-config-prettier": "^10.1.1",
-    "eslint-plugin-jest": "^28.11.0",
+    "@vitest/eslint-plugin": "^1.3.23",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.3.1",
     "tsutils": "^3.21.0",
-    "typescript": "^5.8.2",
-    "typescript-eslint": "^8.29.0"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^3.2.4"
   },
   "volta": {
     "node": "22.14.0",
     "npm": "10.9.2"
+  },
+  "dependencies": {
+    "@apparts/types": "^10.0.10"
   }
 }

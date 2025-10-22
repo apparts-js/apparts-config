@@ -1,25 +1,5 @@
-module.exports.configs = {};
-
-let ENV;
-module.exports.setEnv = (env) => {
-  ENV = env;
-};
-
-const parseB64 = (str) => {
-  try {
-    // eslint-disable-next-line no-undef
-    if (atob) {
-      // eslint-disable-next-line no-undef
-      return atob(str);
-    }
-  } catch (e) {
-    if (e instanceof ReferenceError) {
-      return Buffer.from(str, "base64").toString("ascii");
-    }
-  }
-};
-
-const makeEnvName = (name) => name.toUpperCase().replace(/-/g, "_");
+class ParsingError extends Error {}
+class UnexpectConfigError extends Error {}
 
 /**
  * Loads a config. Tries to load from an environment variable with the
@@ -33,10 +13,16 @@ const makeEnvName = (name) => name.toUpperCase().replace(/-/g, "_");
  * executed.
  * @param config String that contains config-name
  */
-module.exports.load = (config) => {
-  const env_name = makeEnvName(config);
+export const load = (params) => {
+  const {
+    config,
+    configEnvName: env_name,
+    env: ENV,
+    parseB64,
+    configs: configsObj,
+  } = params;
   try {
-    const env = ENV || process.env;
+    const env = { ...process?.env, ...ENV };
     if (
       env[env_name] ||
       env["REACT_APP_" + env_name] ||
@@ -47,14 +33,15 @@ module.exports.load = (config) => {
         env["REACT_APP_" + env_name] ||
         env["VITE_" + env_name];
       try {
-        module.exports.configs[config] = JSON.parse(val);
+        configsObj[config] = JSON.parse(val);
       } catch (e) {
         try {
-          module.exports.configs[config] = JSON.parse(parseB64(val));
+          configsObj[config] = JSON.parse(parseB64(val));
         } catch (e) {
-          throw (
-            `Parsing as JSON or base64 failed: "${env_name}" with` +
-            ` value "${val}"`
+          throw new ParsingError(
+            `Could not load config ${config}. Please make sure, you set up the config correctly:
+
+Parsing as JSON or base64 failed: "${env_name}" with value "${val}"`,
           );
         }
       }
@@ -65,13 +52,13 @@ module.exports.load = (config) => {
 
       try {
         // eval helps to get's rid of warnings in react env.
-        module.exports.configs[config] = eval(
-          `require(${JSON.stringify(directoryJS)})`,
-        );
+        configsObj[config] = eval(`require(${JSON.stringify(directoryJS)})`);
         return;
       } catch (e) {
         if (e.code !== "MODULE_NOT_FOUND") {
-          throw `Unexpected error with ${directoryJS}: ${e}`;
+          throw new UnexpectConfigError(
+            `Unexpected error with ${directoryJS}: ${e}`,
+          );
         }
       }
 
@@ -79,22 +66,27 @@ module.exports.load = (config) => {
         try {
           // eval helps to get's rid of warnings in react env.
           const fs = eval('require("fs")');
-          module.exports.configs[config] = JSON.parse(
-            fs.readFileSync(directoryJSON),
-          );
+          configsObj[config] = JSON.parse(fs.readFileSync(directoryJSON));
         } catch (e) {
           if (e.code === "ENOENT") {
             try {
               // eval helps to get's rid of warnings in react env.
               const fs = eval('require("fs")');
-              module.exports.configs[config] = JSON.parse(
-                fs.readFileSync(directoryJSONExample),
-              );
+              const val = fs.readFileSync(directoryJSONExample);
+              try {
+                configsObj[config] = JSON.parse(val);
+              } catch (e) {
+                throw new ParsingError(
+                  `Could not load config ${config}. Please make sure, you set up the config correctly:
+
+Parsing as JSON or base64 failed: "${config}" with value "${val}"`,
+                );
+              }
             } catch (e) {
               if (e.code === "ENOENT") {
-                throw (
+                throw new UnexpectConfigError(
                   `Neither ${directoryJSON} nor ${directoryJSONExample}` +
-                  ` nor ${directoryJS} found: ${e}`
+                    ` nor ${directoryJS} found: ${e}`,
                 );
               } else {
                 throw e;
@@ -105,51 +97,31 @@ module.exports.load = (config) => {
           }
         }
       } catch (e) {
-        if (e instanceof SyntaxError) {
-          throw `Parsing of Config in directory ${directoryJSON} failed`;
-        } else {
-          throw `Unknown error while trying to parse ${directoryJSON}: ${e}`;
-        }
+        throw new UnexpectConfigError(
+          `Unknown error while trying to parse ${directoryJSON}: ${e}`,
+        );
       }
     }
   } catch (e) {
+    if (e instanceof ParsingError) {
+      throw e.message;
+    }
+
     // eslint-disable-next-line no-restricted-globals
     console.log(e);
     throw `Could not find config ${config}. Please make sure, you set up the config correctly:
 
 On node systems, the config is stored in one of these locations:
 - in a config folder as ${config}.json or ${config}.js or ${config}.example.json
-- as a environment variable ${makeEnvName(
-      config,
-    )}, either as raw text or as base 64 encoded text.
+- as a environment variable ${env_name}, either as raw text or as base 64 encoded text.
 
 With create-react-app:
 - Make sure you called
   > import { setEnv } from "@apparts/config"; setEnv(process.env);
   at the beginning of your app.
-- Config is in the .env file with the variable name REACT_APP_${makeEnvName(
-      config,
-    )} or VITE_${makeEnvName(config)} either as raw text or base 64 encoded.
+- Config is in the .env file with the variable name REACT_APP_${
+      env_name
+    } or VITE_${env_name} either as raw text or base 64 encoded.
     `;
   }
-};
-
-/**
- * Returns the config specified by the config parameter. If the config
- * is not yet loaded, it will be loaded.
- * @param config String that contains config-name
- * @returns {} Configuration-object
- */
-module.exports.get = (config) => {
-  if (!module.exports.configs[config]) {
-    module.exports.load(config);
-  }
-  return module.exports.configs[config];
-};
-
-module.exports.getConfig = (config) => {
-  if (!module.exports.configs[config]) {
-    module.exports.load(config);
-  }
-  return module.exports.configs[config];
 };

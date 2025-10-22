@@ -1,4 +1,4 @@
-import pluginJest from "eslint-plugin-jest";
+import vitest from "@vitest/eslint-plugin";
 import globals from "globals";
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
@@ -27,10 +27,7 @@ export default tseslint.config(
       "**/tests/**",
       "**/fakeData/**",
     ],
-    plugins: { jest: pluginJest },
-    languageOptions: {
-      globals: pluginJest.environments.globals.globals,
-    },
+    plugins: { vitest },
     rules: {
       "no-restricted-globals": ["warn", "console"],
       "jest/no-disabled-tests": "warn",
