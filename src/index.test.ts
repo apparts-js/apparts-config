@@ -43,7 +43,7 @@ describe("getConfig", () => {
     ).toThrow();
   });
   it("should get correctly typed config", async () => {
-    setEnv({ TESTNEW2: JSON.stringify({ configVal: 9 }) });
+    setEnv({ TESTNEW2: JSON.stringify({ configVal: 9, extraVal: 4 }) });
     expect(
       getConfig(
         "testNew2",

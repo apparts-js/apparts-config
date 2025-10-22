@@ -18,12 +18,22 @@ export const getConfig = <S extends types.Schema<any, any>>(
     loadConfig(config);
   }
   if (schema) {
-    const invalid = types.explainSchemaCheck(configs[config], schema);
+    const invalid = types.explainSchemaCheck(
+      types.getPrunedSchema(schema, configs[config]),
+      schema,
+    );
     if (invalid) {
       throw new Error(`Config "${config}" is invalid:\n${invalid}`);
     }
   }
   return configs[config];
+};
+
+export const get = <S extends types.Schema<any, any>>(
+  config: string,
+  schema?: S,
+): types.InferType<S> => {
+  return getConfig(config, schema);
 };
 
 let ENV: Record<string, string> = {};
