@@ -30,12 +30,12 @@ export default tseslint.config(
     plugins: { vitest },
     rules: {
       "no-restricted-globals": ["warn", "console"],
-      "jest/no-disabled-tests": "warn",
-      "jest/no-focused-tests": "error",
-      "jest/no-identical-title": "error",
-      "jest/prefer-to-have-length": "warn",
-      "jest/valid-expect": "error",
-      "jest/expect-expect": [
+      "vitest/no-disabled-tests": "warn",
+      "vitest/no-focused-tests": "error",
+      "vitest/no-identical-title": "error",
+      "vitest/prefer-to-have-length": "warn",
+      "vitest/valid-expect": "error",
+      "vitest/expect-expect": [
         "error",
         {
           assertFunctionNames: [
@@ -100,6 +100,7 @@ export default tseslint.config(
   {
     ignores: [
       "jest.config.js",
+      "vitest.config.ts",
       "dist/*",
       "build/*",
       "config/*",

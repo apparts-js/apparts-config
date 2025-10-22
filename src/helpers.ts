@@ -1,8 +1,6 @@
 export const parseB64 = (str: string) => {
   try {
-    // eslint-disable-next-line no-undef
     if (atob) {
-      // eslint-disable-next-line no-undef
       return atob(str);
     }
     throw new ReferenceError("atob is not defined");
